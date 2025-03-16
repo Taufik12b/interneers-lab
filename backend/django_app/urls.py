@@ -1,8 +1,11 @@
 from django.contrib import admin
-from django.urls import path
-from django.http import HttpResponse
-from django.http import JsonResponse
+from django.urls import path, include
+from django.http import HttpResponse, JsonResponse
+from rest_framework import routers
+from . import views
 
+router = routers.DefaultRouter()
+router.register(r'products', views.ProductViewSet, basename='product')
 
 def hello_world(request):
     name = request.GET.get("name", "world")  # Get 'name' from query params, default to 'world'
@@ -12,4 +15,5 @@ def hello_world(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello_world),
+    path('', include(router.urls)),
 ]
