@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'rest_framework',
-    'django_app',
+    'rest_framework',  # Django Rest Framework for building APIs
+    'django_app',      # Custom Django app for handling product-related logic
 ]
 
 MIDDLEWARE = [
@@ -121,3 +121,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Added REST framework pagination settings
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Use page number-based pagination
+    'PAGE_SIZE': 5,  # Set the number of items per page to 5
+}
