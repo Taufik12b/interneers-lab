@@ -52,6 +52,10 @@ class ProductViewSet(viewsets.ViewSet):
             updated_after = request.query_params.get('updated_after')
             updated_before = request.query_params.get('updated_before')
 
+            categories = request.query_params.getlist('categories')
+            price_min = request.query_params.get('price_min')
+            price_max = request.query_params.get('price_max')
+
             filters = {}
             date_format = "%Y-%m-%d"
 
@@ -69,6 +73,12 @@ class ProductViewSet(viewsets.ViewSet):
                     {"error": "Invalid date format", "message": f"Dates must be in format YYYY-MM-DD"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+            if categories:
+                filters['categories'] = categories
+            if price_min:
+                filters['price_min'] = float(price_min)
+            if price_max:
+                filters['price_max'] = float(price_max)
             products = ProductService.get_all_products(ordering=ordering, filters=filters)
             paginator = self.pagination_class()
             page_size = request.query_params.get('page_size', paginator.page_size)
