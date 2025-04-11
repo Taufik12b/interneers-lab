@@ -1,8 +1,13 @@
 # django_app/urls.py
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.http import JsonResponse
+from rest_framework import routers
+from . import views
+
+router = routers.DefaultRouter()
+router.register(r'products', views.ProductViewSet, basename='product')
 
 def hello_name(request):
     """
@@ -34,6 +39,7 @@ def hello_name(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello_name), 
+    path('', include(router.urls)),
     # Example usage: /hello/?name=Bob
     # returns {"message": "Hello, Bob!"}
 ]
