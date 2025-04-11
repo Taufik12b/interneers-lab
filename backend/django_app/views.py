@@ -5,6 +5,7 @@ from bson import ObjectId
 from django_app.serializers.product_serializer import ProductSerializer
 from django_app.models.product import Product
 from django_app.services.product_service import ProductService
+from datetime import datetime
 
 class ProductPagination(pagination.PageNumberPagination):
     page_size = 5
@@ -44,7 +45,31 @@ class ProductViewSet(viewsets.ViewSet):
 
     def list(self, request):
         try:
-            products = ProductService.get_all_products()
+            ordering = request.query_params.get('ordering')
+
+            created_after = request.query_params.get('created_after')
+            created_before = request.query_params.get('created_before')
+            updated_after = request.query_params.get('updated_after')
+            updated_before = request.query_params.get('updated_before')
+
+            filters = {}
+            date_format = "%Y-%m-%d"
+
+            try:
+                if created_after:
+                    filters['created_after'] = datetime.strptime(created_after, date_format)
+                if created_before:
+                    filters['created_before'] = datetime.strptime(created_before, date_format)
+                if updated_after:
+                    filters['updated_after'] = datetime.strptime(updated_after, date_format)
+                if updated_before:
+                    filters['updated_before'] = datetime.strptime(updated_before, date_format)
+            except ValueError:
+                return Response(
+                    {"error": "Invalid date format", "message": f"Dates must be in format YYYY-MM-DD"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            products = ProductService.get_all_products(ordering=ordering, filters=filters)
             paginator = self.pagination_class()
             page_size = request.query_params.get('page_size', paginator.page_size)
             try:

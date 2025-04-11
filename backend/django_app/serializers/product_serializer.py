@@ -47,6 +47,16 @@ class ProductSerializer(serializers.Serializer):
             "min_value": "Quantity cannot be less than 0."
         }
     )
+
+    created_at = serializers.DateTimeField(
+        read_only=True,
+        format="%Y-%m-%d %H:%M:%S"
+    )
+    updated_at = serializers.DateTimeField(
+        read_only=True,
+        format="%Y-%m-%d %H:%M:%S"
+    )
+
     
     def to_internal_value(self, data):
 
