@@ -11,7 +11,25 @@ def hello_name(request):
     """
     # Get 'name' from the query string, default to 'World' if missing
     name = request.GET.get("name", "World")
-    return JsonResponse({"message": f"Hello, {name}!"})
+    age = request.GET.get("age", "unknown")
+    location = request.GET.get("location", "somewhere")
+    # Age validation
+    if age is not None:
+        try:
+            age = int(age)
+            if age < 0:
+                return JsonResponse({"error": "Age cannot be negative."}, status=400)
+        except ValueError:
+            return JsonResponse({"error": "Age must be an integer."}, status=400)
+    else:
+        age = "unknown"
+    return JsonResponse({
+        "message": f"Hello, {name}!",
+        "details": {
+            "age": age,
+            "location": location
+        }
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
