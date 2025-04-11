@@ -26,3 +26,11 @@ class ProductRepository:
     def delete(product_id):
         product = Product.objects(id=product_id).first()
         product.delete()
+
+    @staticmethod
+    def get_by_category(category_id):
+        return Product.objects(category=category_id)
+    
+    @staticmethod
+    def get_by_name(product_name):
+        return Product.objects(name=product_name).first()

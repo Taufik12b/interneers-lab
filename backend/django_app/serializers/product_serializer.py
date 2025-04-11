@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django_app.models.product import Product
+from django_app.models.category import Category
 from bson import ObjectId
 
 
@@ -15,6 +16,16 @@ class ProductSerializer(serializers.Serializer):
             "max_length": "Title must be at most 100 characters long."
         }
     )
+
+    category = serializers.CharField(
+        required = True, 
+        allow_blank = False,
+        error_messages={
+            "required": "Description is required.",
+            "blank": "Description cannot be empty."
+        }
+    )
+
     description = serializers.CharField(
         required = True, 
         allow_blank = False,
@@ -57,6 +68,11 @@ class ProductSerializer(serializers.Serializer):
         format="%Y-%m-%d %H:%M:%S"
     )
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        category_obj = Category.objects(id=instance.category.id).first()
+        data["category"] = category_obj.title
+        return data
     
     def to_internal_value(self, data):
 
@@ -68,6 +84,11 @@ class ProductSerializer(serializers.Serializer):
             existing_product = Product.objects(name=name).first()
             if existing_product and str(existing_product.id)!=str(product_id):
                 errors["name"] = ["A product with this name already exists."]
+
+        category_title = data.get("category")
+        category_obj = Category.objects(title=category_title).first()
+        if not category_obj:
+            errors["category"] = [f"Category '{category_title}' does not exist."]
 
         try:
             validated_data = super().to_internal_value(data)
@@ -82,4 +103,5 @@ class ProductSerializer(serializers.Serializer):
 
         if errors:
             raise serializers.ValidationError(errors)
+        validated_data["category"] = ObjectId(category_obj.id)
         return validated_data

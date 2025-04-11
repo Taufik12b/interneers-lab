@@ -3,9 +3,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ParseError, NotFound
 from bson import ObjectId
 from django_app.serializers.product_serializer import ProductSerializer
-from django_app.models.product import Product
 from django_app.services.product_service import ProductService
 from datetime import datetime
+
 
 class ProductPagination(pagination.PageNumberPagination):
     page_size = 5
@@ -20,11 +20,11 @@ class ProductViewSet(viewsets.ViewSet):
         try:
             serializer = ProductSerializer(data=request.data)
             if serializer.is_valid():
-                response = ProductService.create_product(serializer.validated_data)
+                product = ProductService.create_product(serializer.validated_data)
                 return Response(
                     {
                         "message": "Product created successfully",
-                        "created_product": response
+                        "created_product": product
                     },
                     status=status.HTTP_200_OK
                 )
@@ -144,7 +144,7 @@ class ProductViewSet(viewsets.ViewSet):
                 return Response(
                     {
                         "message": "Product updated successfully",
-                        "updated_product": ProductSerializer(updated_product).data
+                        "updated_product": updated_product
                     },
                     status=status.HTTP_200_OK
                 )

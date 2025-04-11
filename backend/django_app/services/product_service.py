@@ -45,3 +45,15 @@ class ProductService:
     @staticmethod
     def delete_product(product_id):
         ProductRepository.delete(product_id)
+
+    @staticmethod
+    def get_products_by_category(category_id):
+        products = ProductRepository.get_by_category(category_id)
+        return ProductSerializer(products, many=True).data
+    
+    @staticmethod
+    def get_product_by_name(product_name):
+        product = ProductRepository.get_by_name(product_name)
+        if not product:
+            return None
+        return ProductSerializer(product).data

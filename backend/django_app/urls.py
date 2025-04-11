@@ -4,10 +4,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from rest_framework import routers
-from . import views
+from django_app.views.product_views import ProductViewSet
+from django_app.views.category_views import CategoryViewSet
 
 router = routers.DefaultRouter()
-router.register(r'products', views.ProductViewSet, basename='product')
+router.register(r'products', ProductViewSet, basename='product')
+router.register(r'categories', CategoryViewSet, basename='category')
 
 def hello_name(request):
     """
@@ -39,7 +41,10 @@ def hello_name(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello_name), 
-    path('', include(router.urls)),
     # Example usage: /hello/?name=Bob
     # returns {"message": "Hello, Bob!"}
+    path('', include(router.urls)),
+    path('categories/<str:pk>/products/', CategoryViewSet.as_view({'get': 'list_products'})),
+    path('categories/<str:pk>/add_product/', CategoryViewSet.as_view({'post': 'add_product'})),
+    path('categories/<str:pk>/remove_product/<str:product_id>/', CategoryViewSet.as_view({'delete': 'remove_product'})),
 ]
