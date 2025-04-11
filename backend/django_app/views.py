@@ -1,12 +1,18 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, pagination
 from rest_framework.response import Response
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, NotFound
 from bson import ObjectId
 from django_app.serializers.product_serializer import ProductSerializer
 from django_app.models.product import Product
 
+class ProductPagination(pagination.PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 50
 
 class ProductViewSet(viewsets.ViewSet):
+
+    pagination_class = ProductPagination
 
     def create(self, request):
         try:
@@ -33,8 +39,31 @@ class ProductViewSet(viewsets.ViewSet):
     def list(self, request):
         try:
             products = Product.objects.all()
-            serialized = ProductSerializer(products, many=True)
-            return Response(serialized.data, status=status.HTTP_200_OK)
+            paginator = self.pagination_class()
+            page_size = request.query_params.get('page_size', paginator.page_size)
+            try:
+                page_size = int(page_size)
+                if page_size > paginator.max_page_size:
+                    return Response(
+                        {
+                            "error": "Invalid page size",
+                            "message": f"Page size cannot exceed {paginator.max_page_size}."
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except ValueError:
+                return Response(
+                    {"error": "Invalid page size", "message": "Page size must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            paginated_products = paginator.paginate_queryset(products, request)
+            serialized = ProductSerializer(paginated_products, many=True)
+            return paginator.get_paginated_response(serialized.data)
+        except NotFound:
+            return Response(
+                {"error": "Invalid page", "message": "Requested page is out of range."},
+                status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
             return Response(
                 {"error": "Something went wrong", "message": str(e)},
@@ -55,6 +84,11 @@ class ProductViewSet(viewsets.ViewSet):
                     status=status.HTTP_404_NOT_FOUND
                 )
             return Response(ProductSerializer(product).data, status=status.HTTP_200_OK)
+        except NotFound:
+            return Response(
+                {"error": "Invalid page", "message": "Requested page is out of range."},
+                status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
             return Response(
                 {"error": "Something went wrong", "message": str(e)},
