@@ -44,7 +44,19 @@ urlpatterns = [
     # Example usage: /hello/?name=Bob
     # returns {"message": "Hello, Bob!"}
     path('', include(router.urls)),
-    path('categories/<str:pk>/products/', CategoryViewSet.as_view({'get': 'list_products'})),
-    path('categories/<str:pk>/add_product/', CategoryViewSet.as_view({'post': 'add_product'})),
-    path('categories/<str:pk>/remove_product/<str:product_id>/', CategoryViewSet.as_view({'delete': 'remove_product'})),
+    path(
+        'categories/<str:pk>/products/',
+        CategoryViewSet.as_view({'get': 'list_products'}),
+        name='category-products'
+    ),
+    path(
+        'categories/<str:pk>/add_product/',
+        CategoryViewSet.as_view({'post': 'add_product'}),
+        name='category-add-product'
+    ),
+    path(
+        'categories/<str:pk>/remove_product/<str:product_id>/',
+        CategoryViewSet.as_view({'delete': 'remove_product'}),
+        name='category-remove-product'
+    ),
 ]
