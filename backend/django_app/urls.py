@@ -18,7 +18,7 @@ def hello_name(request):
     """
     # Get 'name' from the query string, default to 'World' if missing
     name = request.GET.get("name", "World")
-    age = request.GET.get("age", "unknown")
+    age = request.GET.get("age")
     location = request.GET.get("location", "somewhere")
     # Age validation
     if age is not None:

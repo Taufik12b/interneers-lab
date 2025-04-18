@@ -39,9 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_app",
     "rest_framework",
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -139,5 +142,9 @@ MONGODB_SETTINGS = {
 }
 
 connect(**MONGODB_SETTINGS)
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 
